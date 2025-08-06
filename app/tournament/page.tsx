@@ -15,7 +15,7 @@ interface Tournament {
   prize: string;
   status: 'upcoming' | 'ongoing' | 'completed';
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
-  format: 'Single Elimination' | 'Double Elimination' | 'Round Robin';
+  format: 'American' | 'Round Robin' | 'Single Elimination' | 'Double Elimination' | 'Pool Play' | 'Swiss System' | 'Ladder' | 'King of the Court';
   registrationDeadline: string;
 }
 
@@ -23,7 +23,7 @@ export default function Tournament() {
   const [activeTab, setActiveTab] = useState<'browse' | 'my-tournaments' | 'create'>('browse');
   const [filterStatus, setFilterStatus] = useState<'all' | 'upcoming' | 'ongoing'>('all');
   
-  // Mock tournament data
+  // Mock tournament data with updated formats
   const tournaments: Tournament[] = [
     {
       id: 1,
@@ -36,7 +36,7 @@ export default function Tournament() {
       prize: '$500 Winner + Trophy',
       status: 'upcoming',
       difficulty: 'Advanced',
-      format: 'Single Elimination',
+      format: 'American',
       registrationDeadline: 'June 10, 2024'
     },
     {
@@ -64,8 +64,36 @@ export default function Tournament() {
       prize: '$300 Winner',
       status: 'completed',
       difficulty: 'Intermediate',
-      format: 'Double Elimination',
+      format: 'Pool Play',
       registrationDeadline: 'May 20, 2024'
+    },
+    {
+      id: 4,
+      name: 'King of Court Challenge',
+      date: 'June 22, 2024',
+      location: 'Elite Sports Complex',
+      participants: 16,
+      maxParticipants: 24,
+      entryFee: 30,
+      prize: '$400 Winner + Equipment',
+      status: 'upcoming',
+      difficulty: 'Intermediate',
+      format: 'King of the Court',
+      registrationDeadline: 'June 18, 2024'
+    },
+    {
+      id: 5,
+      name: 'Swiss Style Open',
+      date: 'July 5, 2024',
+      location: 'Metro Recreation Center',
+      participants: 8,
+      maxParticipants: 32,
+      entryFee: 35,
+      prize: '$600 Prize Pool',
+      status: 'upcoming',
+      difficulty: 'Advanced',
+      format: 'Swiss System',
+      registrationDeadline: 'July 1, 2024'
     }
   ];
 
@@ -91,6 +119,20 @@ export default function Tournament() {
       case 'Intermediate': return 'text-yellow-600 dark:text-yellow-400';
       case 'Advanced': return 'text-red-600 dark:text-red-400';
       default: return 'text-gray-600 dark:text-gray-400';
+    }
+  };
+
+  const getFormatDescription = (format: string) => {
+    switch (format) {
+      case 'American': return 'Partners rotate every 2 games, balanced play';
+      case 'Round Robin': return 'Every team plays every other team';
+      case 'Single Elimination': return 'One loss eliminates team';
+      case 'Double Elimination': return 'Two losses eliminate team';
+      case 'Pool Play': return 'Groups play, then bracket elimination';
+      case 'Swiss System': return 'Pairs matched by similar records';
+      case 'Ladder': return 'Challenge players above you';
+      case 'King of the Court': return 'Winners stay, losers rotate';
+      default: return '';
     }
   };
 
@@ -197,10 +239,20 @@ export default function Tournament() {
                   </div>
                 </div>
 
+                {/* Format Information */}
+                <div className="mt-3 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                    Format: {tournament.format}
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                    {getFormatDescription(tournament.format)}
+                  </div>
+                </div>
+
                 <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
                   <div className="flex justify-between items-center">
                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {tournament.format} • Deadline: {tournament.registrationDeadline}
+                      Registration deadline: {tournament.registrationDeadline}
                     </div>
                     <button
                       className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
@@ -245,16 +297,21 @@ export default function Tournament() {
                   </div>
                   
                   <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                    <div className="flex items-center space-x-2">
-                      <Calendar size={14} />
-                      <span>{tournament.date}</span>
-                      <span className={`ml-auto px-2 py-1 rounded-full text-xs ${getStatusColor(tournament.status)}`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Calendar size={14} />
+                        <span>{tournament.date}</span>
+                      </div>
+                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(tournament.status)}`}>
                         {tournament.status.charAt(0).toUpperCase() + tournament.status.slice(1)}
                       </span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <MapPin size={14} />
                       <span>{tournament.location}</span>
+                    </div>
+                    <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                      {tournament.format} Format
                     </div>
                   </div>
 
@@ -369,10 +426,18 @@ export default function Tournament() {
                 Tournament Format
               </label>
               <select className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
-                <option>Single Elimination</option>
-                <option>Double Elimination</option>
-                <option>Round Robin</option>
+                <option value="American">American Format</option>
+                <option value="Round Robin">Round Robin</option>
+                <option value="Single Elimination">Single Elimination</option>
+                <option value="Double Elimination">Double Elimination</option>
+                <option value="Pool Play">Pool Play</option>
+                <option value="Swiss System">Swiss System</option>
+                <option value="Ladder">Ladder Tournament</option>
+                <option value="King of the Court">King of the Court</option>
               </select>
+              <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                American: Partners rotate every 2 games for balanced play
+              </div>
             </div>
 
             <div>
